@@ -9,30 +9,96 @@ import Skill from "./Skill";
 import Experience from "./Experience";
 import Header from "./Header";
 import Project from "./Project";
-
+import ProtectedRoute from "./ProtectedRoute";
+import useAutoLogout from "./useAutoLogout";
+import { useEffect } from "react";
+import axios from "axios";
 function App() {
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    axios.get("/verify", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .catch(() => {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    });
+  }
+}, []);
+  useAutoLogout();
   const token = localStorage.getItem("token");
   const location = useLocation();
 
-  // Login or Signup page pe header hide karne ke liye
-  const hideHeader = location.pathname === "/login" || location.pathname === "/signup";
+  const hideHeader =
+    location.pathname === "/login" ||
+    location.pathname === "/signup";
 
   return (
     <>
-      {!hideHeader && <Header />} {/* header show only if not login/signup */}
+      {!hideHeader && <Header />}
 
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={token ? <Navigate to="/" /> : <Login />} />
-        <Route path="/signup" element={token ? <Navigate to="/" /> : <Signup />} />
+        <Route
+          path="/login"
+          element={token ? <Navigate to="/" /> : <Login />}
+        />
+        <Route
+          path="/signup"
+          element={token ? <Navigate to="/" /> : <Signup />}
+        />
 
         {/* Protected Routes */}
-        <Route path="/" element={token ? <Home /> : <Navigate to="/login" />} />
-        <Route path="/about" element={token ? <About /> : <Navigate to="/login" />} />
-        <Route path="/project" element={token ? <Project /> : <Navigate to="/login" />} />
-        <Route path="/contact" element={token ? <Contact /> : <Navigate to="/login" />} />
-        <Route path="/skill" element={token ? <Skill /> : <Navigate to="/login" />} />
-        <Route path="/experience" element={token ? <Experience /> : <Navigate to="/login" />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <ProtectedRoute>
+              <About />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/project"
+          element={
+            <ProtectedRoute>
+              <Project />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <ProtectedRoute>
+              <Contact />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/skill"
+          element={
+            <ProtectedRoute>
+              <Skill />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/experience"
+          element={
+            <ProtectedRoute>
+              <Experience />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />

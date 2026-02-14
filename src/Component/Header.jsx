@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Header() {
+  const [loggedInUser,setLoggedInUser]=useState("");
   const navigate = useNavigate();
-
+  useEffect(()=>{
+    setLoggedInUser(localStorage.getItem("loggedInUser"))
+  },[])
   const handleLogout = () => {
     localStorage.removeItem("token"); // token remove karo
-    navigate("/login");               // login page pe redirect
+    localStorage.removeItem("loggedInUser");
+    
+    setTimeout(()=>{
+ navigate("/login");               // login page pe redirect
+    },1000)
+   
   };
-
+ 
   return (
     <header className="bg-blue-600 text-white shadow-md">
       <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
