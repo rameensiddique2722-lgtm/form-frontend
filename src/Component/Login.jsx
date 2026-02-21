@@ -18,13 +18,19 @@ const Login = () => {
       
       // Save token once
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.user.role); // 👈 important
+      localStorage.setItem("admin", res.data.role);
       alert("Login successful");
 
       // Clear form
       setEmail("");
       setPassword("");
 
-      navigate("/");
+      if (res.data.role === "admin") {
+      navigate("/dashboard");   // admin dashboard
+    } else {
+      navigate("/");           // normal home page
+    }
     } catch (err) {
       console.log(err.response?.data);
       setError(err.response?.data?.message || "Login failed");

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Login from "./Login";
 import Signup from "./Signup";
@@ -9,25 +9,30 @@ import Skill from "./Skill";
 import Experience from "./Experience";
 import Header from "./Header";
 import Project from "./Project";
+import Dashboard from "./Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import useAutoLogout from "./useAutoLogout";
-import { useEffect } from "react";
 import axios from "axios";
-function App() {
-  useEffect(() => {
-  const token = localStorage.getItem("token");
 
-  if (token) {
-    axios.get("/verify", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    .catch(() => {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    });
-  }
-}, []);
+function App() {
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      axios.get("/verify", {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .catch(() => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        window.location.href = "/login";
+      });
+    }
+  }, []);
+
   useAutoLogout();
+
   const token = localStorage.getItem("token");
   const location = useLocation();
 
@@ -40,6 +45,7 @@ function App() {
       {!hideHeader && <Header />}
 
       <Routes>
+
         {/* Public Routes */}
         <Route
           path="/login"
@@ -59,6 +65,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/about"
           element={
@@ -67,6 +74,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/project"
           element={
@@ -75,6 +83,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/contact"
           element={
@@ -83,6 +92,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/skill"
           element={
@@ -91,6 +101,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/experience"
           element={
@@ -100,8 +111,19 @@ function App() {
           }
         />
 
+        {/* ✅ Admin Only Route */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
+
       </Routes>
     </>
   );
